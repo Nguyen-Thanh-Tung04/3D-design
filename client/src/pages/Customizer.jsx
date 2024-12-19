@@ -73,140 +73,61 @@ const Customizer = () => {
 
   const sendButton = async (type) => {
     if (!prompt) return alert("Please enter the prompt!");
-    
+
     const OPENAI_API_KEY = ""; // Thay thế bằng API Key của bạn
 
     setLoadingMessage("Đang tạo hình ảnh... Vui lòng đợi.");
     setImageUrls([]); // Xóa các hình ảnh cũ
     setSelectedImage(""); // Reset ảnh đã chọn
-  
+
     try {
-        // Gửi yêu cầu tới OpenAI API
-        const response = await fetch("https://api.openai.com/v1/images/generations", {
-          method: "POST",
-          headers: {
-            "Authorization": "Bearer " + OPENAI_API_KEY,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            prompt: prompt,  // Prompt mô tả hình ảnh cần tạo
-            n: 1,             // Số lượng hình ảnh cần tạo
-            size: "256x256"   // Kích thước của hình ảnh (256x256, 512x512, hoặc 1024x1024)
-          }),
-        });
+      // Gửi yêu cầu tới OpenAI API
+      const response = await fetch("https://api.openai.com/v1/images/generations", {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + OPENAI_API_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt: prompt,  // Prompt mô tả hình ảnh cần tạo
+          n: 3,             // Số lượng hình ảnh cần tạo
+          size: "256x256"  , // Kích thước của hình ảnh (256x256, 512x512, hoặc 1024x1024)
+          response_format: "b64_json" // Định dạng trả về Base64
+        }),
+      });
 
-        // Kiểm tra nếu response không thành công
-        if (!response.ok) {
-          throw new Error('Error fetching image from OpenAI API');
-        }
+      // Kiểm tra nếu response không thành công
+      if (!response.ok) {
+        throw new Error('Error fetching image from OpenAI API');
+      }
 
-        // Chuyển đổi response thành JSON
-        const data = await response.json();
-        console.log('data',data)
-        const imageUrl = data.data[0].url;
-        console.log('imageUrl',imageUrl)
-        const payload = {
-          image_url: imageUrl
-      };
+      // Chuyển đổi response thành JSON
+      const data = await response.json();
+      // Trích xuất URL của 3 ảnh và cập nhật vào state
+      const urls = data.data.map((item) => `data:image/png;base64,${item.b64_json}`);
+      console.log('123', urls)
+      setImageUrls(urls); // Cập nhật state với các URL của ảnh
+      setLoadingMessage(""); // Xóa thông báo loading
 
-            // Gửi dữ liệu bằng fetch
-            const apiResponse = await axios.post(
-              "http://127.0.0.1:8000/api/upload",
-              {
-                image_url: imageUrl
-              },
-              {
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            }
-          );      // 
-        //   console.log(apiResponse)
-        // // Trích xuất URL của 3 ảnh và cập nhật vào state
-          const urls = apiResponse.data.image_url;
-          // setImgTest("https://erp-cloodo-data.s3.us-west-2.amazonaws.com/app-logo/8c2ff445cc515e41c19b832f166a472e.png")
-          console.log('urls', urls)
-          const arr = [urls]
-          setImageUrls(arr); // Cập nhật state với các URL của ảnh
-          setLoadingMessage(""); // Xóa thông báo loading
-          
     } catch (error) {
       console.error("Error:", error);
       setLoadingMessage("Có lỗi xảy ra. Vui lòng thử lại!");
     }
   };
+
   const handleSubmit = async (type) => {
-    const imageUrl =
-      "https://oaidalleapiprodscus.blob.core.windows.net/private/org-q1nPlzpQ1BN2vhvmHleu0CLS/user-n2yL90H59weNfLyiWbo48NHj/img-71PfaWUaDMnqRv1Rn7wNL6T9.png?st=2024-12-19T02%3A24%3A24Z&se=2024-12-19T04%3A24%3A24Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=d505667d-d6c1-4a0a-bac7-5c84a87759f8&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2024-12-19T00%3A14%3A34Z&ske=2024-12-20T00%3A14%3A34Z&sks=b&skv=2024-08-04&sig=FewuaIrsugm/4hRYCwTZaXEcks14Dv91Fy26oMsqXhw%3D";
+    if (!selectedImage) {
+      return alert("Please select an image first!");
+    }
   
     try {
-      // Tải ảnh từ URL
-      const response = await fetch(imageUrl);
-      if (!response.ok) {
-        throw new Error("Failed to fetch image");
-      }
-  
-      // Chuyển đổi ảnh thành Blob
-      const blob = await response.blob();
-  
-      // Mã hóa Blob thành Base64
-      const base64 = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result); // Chuỗi Base64
-        reader.onerror = reject;
-        reader.readAsDataURL(blob); // Đọc Blob và chuyển thành Base64
-      });
-  
-      console.log("Base64 Image:", base64);
-  
-      // Truyền Base64 hoặc URL gốc cho handleDecal
-      handleDecal(type, base64); // Bạn có thể truyền URL hoặc Base64 tùy theo yêu cầu
+      console.log(selectedImage,type);
+      // Thực hiện áp dụng URL của ảnh đã chọn vào sản phẩm (hoặc thực hiện logic khác)
+      handleDecal(type, selectedImage); // Áp dụng URL ảnh đã chọn cho sản phẩm
     } catch (error) {
-      console.error("Error in handleSubmit:", error);
+      console.error("Error applying image:", error);
     }
   };
-  
-
-  // const handleSubmit = async (type) => {
-  //   // const imageUrl = "https://erp-cloodo-data.s3.us-west-2.amazonaws.com/app-logo/8c2ff445cc515e41c19b832f166a472e.png"
-  //   const imageUrl = "https://oaidalleapiprodscus.blob.core.windows.net/private/org-q1nPlzpQ1BN2vhvmHleu0CLS/user-n2yL90H59weNfLyiWbo48NHj/img-71PfaWUaDMnqRv1Rn7wNL6T9.png?st=2024-12-19T02%3A24%3A24Z&se=2024-12-19T04%3A24%3A24Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=d505667d-d6c1-4a0a-bac7-5c84a87759f8&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2024-12-19T00%3A14%3A34Z&ske=2024-12-20T00%3A14%3A34Z&sks=b&skv=2024-08-04&sig=FewuaIrsugm/4hRYCwTZaXEcks14Dv91Fy26oMsqXhw%3D"
-    
-
-
-  //   const fetImage =  fetch(imageUrl).then(result => {
-  //     console.log(result.blob);
-      
-  //   });
-  //   handleDecal(type, imageUrl); return;
-  //   if (!selectedImage) {
-  //     return alert("Please select an image first!");
-  //   }
-  
-  //   try {
-  //     console.log(selectedImage,type);
-  //     // Thực hiện áp dụng URL của ảnh đã chọn vào sản phẩm (hoặc thực hiện logic khác)
-  //     handleDecal(type, selectedImage); // Áp dụng URL ảnh đã chọn cho sản phẩm
-  //     alert(`Image applied to the product with type: ${type}`);
-  //   } catch (error) {
-  //     console.error("Error applying image:", error);
-  //     alert("Something went wrong while applying the image.");
-  //   }
-  // };
-  // const handleSubmit = async (type) => {
-  //   if (!selectedImage) {
-  //     return alert("Please select an image first!");
-  //   }
-  
-  //   try {
-  //     console.log(selectedImage,type);
-  //     // Thực hiện áp dụng URL của ảnh đã chọn vào sản phẩm (hoặc thực hiện logic khác)
-  //     handleDecal(type, selectedImage); // Áp dụng URL ảnh đã chọn cho sản phẩm
-  //     alert(`Image applied to the product with type: ${type}`);
-  //   } catch (error) {
-  //     console.error("Error applying image:", error);
-  //     alert("Something went wrong while applying the image.");
-  //   }
-  // };
 
 
 
