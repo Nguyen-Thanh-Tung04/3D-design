@@ -19,12 +19,12 @@ const Shirt = () => {
     setIsHovering(true);
     document.body.style.cursor = 'pointer'; // Thay đổi kiểu con trỏ thành pointer
   };
-  
+
   const handlePointerOut = (event) => {
     setIsHovering(false);
     document.body.style.cursor = 'auto'; // Khôi phục kiểu con trỏ về mặc định
   };
-  
+
   // Tham chiếu đến đối tượng áo thun trong scene để cập nhật góc xoay.
   const meshRef = useRef();
 
@@ -40,7 +40,7 @@ const Shirt = () => {
 
   // Lưu vị trí ban đầu khi component được mount
   const initialRotation = useRef({ x: 0, y: 0 });
-  
+
   useEffect(() => {
     if (meshRef.current) {
       initialRotation.current = { x: meshRef.current.rotation.x, y: meshRef.current.rotation.y };

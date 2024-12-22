@@ -17,6 +17,15 @@ const FilePicker = ({ file, setFile, readFile }) => {
     }
   };
 
+  const handleRemovePreview = () => {
+    // Hủy URL xem trước và đặt lại trạng thái
+    if (preview) {
+      URL.revokeObjectURL(preview);
+    }
+    setPreview(null);
+    setFile(null);
+  };
+
   return (
     <div className="filepicker-container">
       <div className="flex flex-1 flex-col">
@@ -31,16 +40,22 @@ const FilePicker = ({ file, setFile, readFile }) => {
         </label>
         {/* Hiển thị ảnh xem trước */}
         {preview && (
-          <div className="mt-4">
+          <div className="mt-4 relative">
             <img
               src={preview}
               alt="Preview"
               className="w-32 h-32 object-cover rounded border"
             />
+            <button
+              onClick={handleRemovePreview}
+              className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 text-xs"
+            >
+              ✕
+            </button>
           </div>
         )}
         <p className="mt-2 text-gray-600 text-sm truncate">
-          {file === '' ? 'No file selected' : file.name}
+          {file === null ? 'No file selected' : file.name}
         </p>
       </div>
 

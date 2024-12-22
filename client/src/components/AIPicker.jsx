@@ -14,7 +14,7 @@ const AIPicker = ({
   selectedImage // Lưu URL của ảnh đã chọn
 }) => {
   return (
-    <div className="aipicker-container">
+    <div className="aipicker-container z-auto">
       <div className="items-center gap-2">
         <textarea
           placeholder="Ask AI..."
@@ -67,7 +67,7 @@ const AIPicker = ({
           {/* <p className="text-xs text-gray-500 break-all mt-2">{selectedImage}</p> */}
         </div>
       )}
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3 ">
         {generatingImg ? (
           <CustomButton 
             type="outline"

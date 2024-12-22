@@ -48,8 +48,22 @@ html {
 }
 
 .filtertabs-container {
-  @apply absolute z-10 bottom-5 right-0 left-0 w-full flex justify-center items-center flex-wrap gap-4;
+  @apply absolute bottom-5 right-0 left-0 w-full flex justify-center items-center flex-wrap gap-4;
 }
+
+.tab-btn {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.tab-btn.active-tab {
+  background-color: #d1d5db; /* Màu nền khi được chọn */
+  opacity: 0.8;
+}
+.custom-confirm-button {
+  @apply px-2 py-1.5 flex-1 rounded-lg drop-shadow-lg hover:drop-shadow-xl hover:scale-105 duration-200;
+}
+
 
 .aipicker-container {
   @apply absolute left-full ml-3 glassmorphism p-3 w-[500px] h-[220px] rounded-md flex flex-col gap-4 top-0;
